@@ -6,6 +6,10 @@
   <title>TechnoTank - Multi-purpose Innovation</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
+    html {
+      scroll-behavior: smooth; /* ✅ Smooth scrolling */
+    }
+
     /* Seal watermark background */
     body::before {
       content: "";
@@ -67,12 +71,11 @@
   <header class="bg-gradient-to-r from-indigo-600 to-purple-600 shadow-lg sticky top-0 z-40">
     <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between text-white">
       <a href="#" class="flex items-center gap-3">
-        <!-- Logo + Text aligned -->
         <div class="flex items-center gap-2">
-          <img src="school-logo.png" alt="School Logo" class="h-10 w-auto">
+          <img src="school-logo.png" height="40" width="40" class="rounded-full">
           <div>
-            <div class="text-lg font-bold">Multi Purpose Techno Tank</div>
-            <div class="text-xs opacity-80">Santiago Malvar Senior High School Innovation</div>
+            <div class="text-lg font-bold">Techno Tank</div>
+            <div class="text-xs opacity-80">Santiago-Malvar SHS Innovation</div>
           </div>
         </div>
       </a>
@@ -81,12 +84,13 @@
         <a href="#features" class="hover:text-yellow-300 transition">Features</a>
         <a href="#how" class="hover:text-yellow-300 transition">How it works</a>
         <a href="#impact" class="hover:text-yellow-300 transition">Impact</a>
+        <a href="#weather" class="hover:text-yellow-300 transition">Weather</a> <!-- ✅ NEW -->
         <a href="#contact" class="hover:text-yellow-300 transition">Contact</a>
       </nav>
 
       <div class="hidden md:flex gap-3">
         <a href="#contact" class="inline-flex items-center px-4 py-2 rounded-full bg-yellow-400 text-indigo-900 text-sm font-semibold shadow hover:bg-yellow-300 transition">
-          🚀 Contact Us
+          🚀 Get a demo
         </a>
       </div>
     </div>
@@ -144,6 +148,147 @@
       </p>
     </div>
   </section>
+<!-- WEATHER SECTION -->
+<section id="weather" class="py-20 bg-gradient-to-r from-blue-50 via-indigo-50 to-purple-50">
+  <div class="max-w-5xl mx-auto px-6 text-center fade-in">
+    <h2 class="text-3xl font-bold mb-6 text-indigo-700">🌦 Live Weather Today</h2>
+    <p class="mb-8 text-gray-700">Choose a province and city in CALABARZON or let us detect your location.</p>
+
+    <!-- Location Selector -->
+    <div class="mb-6 flex items-center justify-center gap-4">
+      <select id="provinceSelect" class="px-4 py-2 border rounded-lg shadow focus:outline-none focus:ring focus:ring-indigo-300">
+        <option value="">Select Province</option>
+        <option value="cavite">Cavite</option>
+        <option value="laguna">Laguna</option>
+        <option value="batangas">Batangas</option>
+        <option value="rizal">Rizal</option>
+        <option value="quezon">Quezon</option>
+      </select>
+
+      <select id="citySelect" class="px-4 py-2 border rounded-lg shadow focus:outline-none focus:ring focus:ring-indigo-300">
+        <option value="">Select City/Municipality</option>
+      </select>
+
+      <button id="detectBtn" class="px-4 py-2 bg-indigo-600 text-white rounded-lg shadow hover:bg-indigo-500 transition">
+        📡 Detect Location
+      </button>
+    </div>
+
+    <!-- Weather Card -->
+    <div id="weatherCard" class="bg-white rounded-2xl shadow-2xl p-8 max-w-lg mx-auto">
+      <div class="flex items-center justify-between mb-6">
+        <div class="text-left">
+          <h3 id="cityName" class="text-2xl font-bold text-indigo-700">Select a City</h3>
+          <p id="dateToday" class="text-gray-500"></p>
+        </div>
+        <div class="text-right">
+          <span id="tempNow" class="text-5xl font-extrabold text-blue-600">--°C</span>
+          <p id="feelsLike" class="text-gray-600">Feels like --°C</p>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-center mb-8">
+        <img id="weatherIcon" src="https://cdn-icons-png.flaticon.com/512/1163/1163661.png" alt="Weather" class="w-24 h-24">
+        <p id="condition" class="ml-4 text-xl font-semibold text-yellow-600">--</p>
+      </div>
+
+      <div id="forecast" class="grid grid-cols-3 gap-4 text-center"></div>
+    </div>
+  </div>
+</section>
+
+<script>
+  // 🌍 Static Weather Data for all CALABARZON cities
+  const weatherData = {
+    cavite: {
+      cavite_city: { temp: "30°C", feels: "32°C", condition: "Partly Cloudy", icon: "https://cdn-icons-png.flaticon.com/512/1163/1163661.png" },
+      tagaytay: { temp: "29°C", feels: "31°C", condition: "Cloudy", icon: "https://cdn-icons-png.flaticon.com/512/1163/1163624.png" },
+      dasmarinas: { temp: "31°C", feels: "33°C", condition: "Sunny", icon: "https://cdn-icons-png.flaticon.com/512/869/869869.png" }
+      // add other cities as needed
+    },
+    laguna: {
+      calamba: { temp: "31°C", feels: "33°C", condition: "Sunny", icon: "https://cdn-icons-png.flaticon.com/512/1163/1163661.png" },
+      santa_rosa: { temp: "30°C", feels: "32°C", condition: "Rain Showers", icon: "https://cdn-icons-png.flaticon.com/512/1146/1146869.png" },
+      binan: { temp: "30°C", feels: "32°C", condition: "Partly Cloudy", icon: "https://cdn-icons-png.flaticon.com/512/1163/1163624.png" }
+    },
+    batangas: {
+      batangas_city: { temp: "32°C", feels: "34°C", condition: "Hot & Sunny", icon: "https://cdn-icons-png.flaticon.com/512/869/869869.png" },
+      lipa: { temp: "31°C", feels: "33°C", condition: "Sunny", icon: "https://cdn-icons-png.flaticon.com/512/1163/1163661.png" }
+    },
+    rizal: {
+      antipolo: { temp: "28°C", feels: "30°C", condition: "Cloudy", icon: "https://cdn-icons-png.flaticon.com/512/1163/1163624.png" },
+      cainta: { temp: "28°C", feels: "30°C", condition: "Rainy", icon: "https://cdn-icons-png.flaticon.com/512/1146/1146869.png" }
+    },
+    quezon: {
+      lucena: { temp: "27°C", feels: "29°C", condition: "Rainy", icon: "https://cdn-icons-png.flaticon.com/512/1146/1146869.png" },
+      tayabas: { temp: "28°C", feels: "30°C", condition: "Partly Cloudy", icon: "https://cdn-icons-png.flaticon.com/512/1163/1163661.png" }
+    }
+  };
+
+  const provinceSelect = document.getElementById("provinceSelect");
+  const citySelect = document.getElementById("citySelect");
+  const cityName = document.getElementById("cityName");
+  const tempNow = document.getElementById("tempNow");
+  const feelsLike = document.getElementById("feelsLike");
+  const condition = document.getElementById("condition");
+  const weatherIcon = document.getElementById("weatherIcon");
+  const forecastDiv = document.getElementById("forecast");
+
+  // 🗓 Date & Time
+  function updateDateTime() {
+    const now = new Date();
+    document.getElementById("dateToday").textContent =
+      now.toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "short", day: "numeric" }) +
+      " | " +
+      now.toLocaleTimeString("en-US", { hour: '2-digit', minute: '2-digit' });
+  }
+  setInterval(updateDateTime, 1000);
+  updateDateTime();
+
+  // Update City dropdown based on province
+  provinceSelect.addEventListener("change", () => {
+    const province = provinceSelect.value;
+    citySelect.innerHTML = '<option value="">Select City/Municipality</option>';
+    if(province && weatherData[province]) {
+      Object.keys(weatherData[province]).forEach(city => {
+        const option = document.createElement("option");
+        option.value = city;
+        option.textContent = city.replace(/_/g," ").replace(/\b\w/g,l => l.toUpperCase());
+        citySelect.appendChild(option);
+      });
+    }
+  });
+
+  // Update weather when city is selected
+  citySelect.addEventListener("change", () => {
+    const province = provinceSelect.value;
+    const city = citySelect.value;
+    if(province && city && weatherData[province][city]) {
+      const data = weatherData[province][city];
+      cityName.textContent = city.replace(/_/g," ").replace(/\b\w/g,l => l.toUpperCase()) + ", PH";
+      tempNow.textContent = data.temp;
+      feelsLike.textContent = "Feels like " + data.feels;
+      condition.textContent = data.condition;
+      weatherIcon.src = data.icon;
+      forecastDiv.innerHTML = ""; // optional: add forecast later
+    }
+  });
+
+  // 📡 Detect Location (basic)
+  document.getElementById("detectBtn").addEventListener("click", () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(pos => {
+        const { latitude, longitude } = pos.coords;
+        alert("📍 Your location: Lat " + latitude.toFixed(2) + ", Lon " + longitude.toFixed(2) + ". Please select nearest city manually.");
+      }, () => {
+        alert("❌ Location access denied. Please select manually.");
+      });
+    } else {
+      alert("❌ Geolocation not supported.");
+    }
+  });
+</script>
+
 
   <!-- CONTACT -->
   <section id="contact" class="py-20 bg-gradient-to-r from-indigo-600 to-purple-600 text-white">
@@ -151,7 +296,6 @@
       <h2 class="text-3xl font-bold mb-6">📩 Contact Us</h2>
       <p class="mb-6 opacity-90">
         Want to learn more or request a demo of the Multi-purpose TechnoTank? Reach out to us.
-		306337@deped.gov.ph
       </p>
       <a href="mailto:info@technotank.com" class="px-6 py-3 bg-yellow-400 text-indigo-900 rounded-full shadow-lg hover:bg-yellow-300 transition transform hover:scale-105">
         ✉️ Email Us
